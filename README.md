@@ -54,4 +54,37 @@ run:
 ### exiting the shell
 `exit`: Exit the shell.
 
+## How it works
 
+#### Main
+The main loop of the shell continuously prompts the user for input, tokenizes the input into a Cmd struct, and then performs various actions based on the input. It supports exiting the shell, displaying job information, resuming stopped jobs, and executing commands in the foreground or background.
+
+#### Global Variables
+Defines global variables and arrays to manage jobs, the current foreground job, the foreground process PID, and the number of jobs.
+
+#### Struct Definition - Cmd
+Cmd to holds information about a command, including the command line, tokenized command, arguments, symbols, process ID, and status flags (done, printed, stopped). It is used to represent each command to be executed.
+
+#### Signal Handler 
+sigtstpHandler Handles the SIGTSTP signal (usually triggered by Ctrl+Z), which suspends the currently running foreground process and adds it to the list of jobs in a stopped state.
+
+#### parseCmd()
+Tokenizes a command line input into individual arguments and symbols, storing them in the Cmd struct for later use.
+
+#### findSymbol()
+Searches for the index of a specific symbol within the Cmd struct's symbols array.
+
+#### executeCommand()
+Handles the execution of a command. It checks for input/output redirection and piping, and if neither is found, it executes the command using the execvp function.
+
+#### backgroundCmd()
+Executes a command in the background by forking a child process and adding it to the list of jobs. The parent process displays the job's information.
+
+#### foreGroundCmd()
+Executes a command in the foreground by forking a child process. The parent process waits for the child process to finish before displaying the prompt again.
+
+#### processCheck()
+Checks the status of background jobs. It iterates through the list of jobs, checks if any have terminated, and displays relevant information about them.
+
+#### Memory Management
+The program dynamically allocates memory for the Cmd structs representing jobs. It also deallocates this memory at the end of the program.
